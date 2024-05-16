@@ -10,76 +10,101 @@ die() {
 }
 
 show_help() {
-    printf 'Correct Usage: ./install -u [new-username] -p [access-password] -d [domain]\n' >&2
+    printf 'Correct Usage: ./install -u [new-username] -p [access-password] -d [domain]\n'
     exit 1
 }
 
 validate_input() {
-  while :; do
-      case $1 in
-          -h|--help)
-              show_help
-              exit
-              ;;
-          -u)
-              if [ "$2" ]; then
-                  user=$2
-                  shift
-              else
-                  die 'ERROR: "-u" requires a non-empty option argument.'
-              fi
-              ;;
-          -p)
-              if [ "$2" ]; then
-                  pass=$2
-                  shift
-              else
-                  die 'ERROR: "-p" requires a non-empty option argument.'
-              fi
-              ;;
-          -d)
-              if [ "$2" ]; then
-                  domain=$2
-                  shift
-              else
-                  die 'ERROR: "-d" requires a non-empty option argument.'
-              fi
-              ;;
-          --)
-              shift
-              break
-              ;;
-          -?*)
-              printf 'WARN: Unknown option: %s\n' "$1" >&2
-              show_help
-              exit
-              ;;
-          *)               # Default case: No more options, so break out of the loop.
-              break
-      esac
+    while :; do
+        case $1 in
+            -h|--help)
+                show_help
+                exit
+                ;;
+            -u)
+                if [ "$2" ]; then
+                    user=$2
+                    shift
+                else
+                    die 'ERROR: "-u" requires a non-empty option argument.'
+                fi
+                ;;
+            -p)
+                if [ "$2" ]; then
+                    pass=$2
+                    shift
+                else
+                    die 'ERROR: "-p" requires a non-empty option argument.'
+                fi
+                ;;
+            -d)
+                if [ "$2" ]; then
+                    domain=$2
+                    shift
+                else
+                    die 'ERROR: "-d" requires a non-empty option argument.'
+                fi
+                ;;
+            --)
+                shift
+                break
+                ;;
+            -?*)
+                printf 'WARN: Unknown option: %s\n' "$1" >&2
+                show_help
+                exit
+                ;;
+            *)
+                break
+        esac
+        shift
+    done
 
-      shift
-  done
+    if [[ -z "$user" ]]; then
+        printf 'ERROR: "-u" is a required argument.\n'
+        show_help
+        exit
+    fi
 
-  if [[ -z "$user" ]]; then
-      printf 'ERROR: "-u" is a required argument.\n'
-      show_help
-      exit
-  fi
+    if [[ -z "$pass" ]]; then
+        printf 'ERROR: "-p" is a required argument.\n'
+        show_help
+        exit
+    fi
 
-  if [[ -z "$pass" ]]; then
-      printf 'ERROR: "-p" is a required argument.\n'
-      show_help
-      exit
-  fi
+    if [[ -z "$domain" ]]; then
+        printf 'ERROR: "-d" is a required argument.\n'
+        show_help
+        exit
+    fi
+}
 
-  if [[ -z "$domain" ]]; then
-      printf 'ERROR: "-d" is a required argument.\n'
-      show_help
-      exit
-  fi
+create_user_if_not_exists() {
+    if id "$user" >/dev/null 2>&1; then
+        printf 'user already exists\n'
+    else
+        adduser "$user"
+        printf 'user %s created\n' "$user"
+    fi
+}
+
+
+add_user_to_sudo_if_not_already_present() {
+    if id -nG "$user" | grep -qw sudo; then
+        printf 'user already belongs to sudo\n'
+    else
+        usermod -aG sudo "$user"
+        printf 'user %s added to sudo\n' "$user"
+    fi
+}
+
+setup_non_root_user() {
+    create_user_if_not_exists
+    add_user_to_sudo_if_not_already_present
 }
 
 validate_input "$@"
 
-printf 'success %s %s %s\n' "$user" "$pass" "$domain" >&2
+setup_non_root_user
+
+printf 'success %s %s %s\n' "$user" "$pass" "$domain"
