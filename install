@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-user=
-pass=
+username=
+password=
 domain=
 
 die() {
@@ -23,7 +23,7 @@ validate_input() {
                 ;;
             -u)
                 if [ "$2" ]; then
-                    user=$2
+                    username=$2
                     shift
                 else
                     die 'ERROR: "-u" requires a non-empty option argument.'
@@ -31,7 +31,7 @@ validate_input() {
                 ;;
             -p)
                 if [ "$2" ]; then
-                    pass=$2
+                    password=$2
                     shift
                 else
                     die 'ERROR: "-p" requires a non-empty option argument.'
@@ -60,13 +60,13 @@ validate_input() {
         shift
     done
 
-    if [[ -z "$user" ]]; then
+    if [[ -z "$username" ]]; then
         printf 'ERROR: "-u" is a required argument.\n'
         show_help
         exit
     fi
 
-    if [[ -z "$pass" ]]; then
+    if [[ -z "$password" ]]; then
         printf 'ERROR: "-p" is a required argument.\n'
         show_help
         exit
@@ -80,31 +80,37 @@ validate_input() {
 }
 
 create_user_if_not_exists() {
-    if id "$user" >/dev/null 2>&1; then
+    if id "$username" >/dev/null 2>&1; then
         printf 'user already exists\n'
     else
-        adduser "$user"
-        printf 'user %s created\n' "$user"
+        adduser "$username"
+        printf 'user %s created\n' "$username"
     fi
 }
 
 
 add_user_to_sudo_if_not_already_present() {
-    if id -nG "$user" | grep -qw sudo; then
+    if id -nG "$username" | grep -qw sudo; then
         printf 'user already belongs to sudo\n'
     else
-        usermod -aG sudo "$user"
-        printf 'user %s added to sudo\n' "$user"
+        usermod -aG sudo "$username"
+        printf 'user %s added to sudo\n' "$username"
     fi
 }
 
 setup_non_root_user() {
     create_user_if_not_exists
     add_user_to_sudo_if_not_already_present
+
+    if id -nG "$username" | grep -qw sudo; then
+        printf 'user is successfully setup\n'
+    else
+        die 'ERROR: unable to setup the non root user'
+    fi
 }
 
 validate_input "$@"
 
 setup_non_root_user
 
-printf 'success %s %s %s\n' "$user" "$pass" "$domain"
+printf 'success %s %s %s\n' "$username" "$password" "$domain"
