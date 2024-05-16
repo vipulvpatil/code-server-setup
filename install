@@ -109,8 +109,17 @@ setup_non_root_user() {
     fi
 }
 
+setup_ssh_if_not_done_previously() {
+    user_ssh_directory=/home/"$username"/.ssh
+    if [ ! -d "$user_ssh_directory" ]; then
+        rsync --archive --chown="$username":"$username" ~/.ssh /home/"$username"
+        printf 'user ssh setup finished\n'
+    fi
+}
+
 validate_input "$@"
 
 setup_non_root_user
+setup_ssh_if_not_done_previously
 
 printf 'success %s %s %s\n' "$username" "$password" "$domain"
