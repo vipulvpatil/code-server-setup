@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+user=
+pass=
+domain=
+
 die() {
     printf '%s\n' "$1" >&2
     exit 1
@@ -10,72 +14,72 @@ show_help() {
     exit 1
 }
 
-user=
-pass=
-domain=
+validate_input() {
+  while :; do
+      case $1 in
+          -h|--help)
+              show_help
+              exit
+              ;;
+          -u)
+              if [ "$2" ]; then
+                  user=$2
+                  shift
+              else
+                  die 'ERROR: "-u" requires a non-empty option argument.'
+              fi
+              ;;
+          -p)
+              if [ "$2" ]; then
+                  pass=$2
+                  shift
+              else
+                  die 'ERROR: "-p" requires a non-empty option argument.'
+              fi
+              ;;
+          -d)
+              if [ "$2" ]; then
+                  domain=$2
+                  shift
+              else
+                  die 'ERROR: "-d" requires a non-empty option argument.'
+              fi
+              ;;
+          --)
+              shift
+              break
+              ;;
+          -?*)
+              printf 'WARN: Unknown option: %s\n' "$1" >&2
+              show_help
+              exit
+              ;;
+          *)               # Default case: No more options, so break out of the loop.
+              break
+      esac
 
-while :; do
-    case $1 in
-        -h|--help)
-            show_help
-            exit
-            ;;
-        -u)
-            if [ "$2" ]; then
-                user=$2
-                shift
-            else
-                die 'ERROR: "-u" requires a non-empty option argument.'
-            fi
-            ;;
-        -p)
-            if [ "$2" ]; then
-                pass=$2
-                shift
-            else
-                die 'ERROR: "-p" requires a non-empty option argument.'
-            fi
-            ;;
-        -d)
-            if [ "$2" ]; then
-                domain=$2
-                shift
-            else
-                die 'ERROR: "-d" requires a non-empty option argument.'
-            fi
-            ;;
-        --)
-            shift
-            break
-            ;;
-        -?*)
-            printf 'WARN: Unknown option: %s\n' "$1" >&2
-            show_help
-            exit
-            ;;
-        *)               # Default case: No more options, so break out of the loop.
-            break
-    esac
+      shift
+  done
 
-    shift
-done
+  if [[ -z "$user" ]]; then
+      printf 'ERROR: "-u" is a required argument.\n'
+      show_help
+      exit
+  fi
 
-if [[ -z "$user" ]]; then
-    printf 'ERROR: "-u" is a required argument.\n'
-    show_help
-    exit
-fi
+  if [[ -z "$pass" ]]; then
+      printf 'ERROR: "-p" is a required argument.\n'
+      show_help
+      exit
+  fi
 
-if [[ -z "$pass" ]]; then
-    printf 'ERROR: "-p" is a required argument.\n'
-    show_help
-    exit
-fi
+  if [[ -z "$domain" ]]; then
+      printf 'ERROR: "-d" is a required argument.\n'
+      show_help
+      exit
+  fi
+}
 
-if [[ -z "$domain" ]]; then
-    printf 'ERROR: "-d" is a required argument.\n'
-    show_help
-    exit
-fi
+validate_input "$@"
 
 printf 'success %s %s %s\n' "$user" "$pass" "$domain" >&2
