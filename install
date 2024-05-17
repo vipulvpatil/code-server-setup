@@ -4,6 +4,11 @@ username=
 password=
 domain=
 
+base_dir="$( cd "$( dirname "$0" )" && pwd )"
+code_server_version="4.89.1"
+code_server_folder_name="code-server-$code_server_version-linux-amd64"
+code_server_tarball_name="$code_server_folder_name.tar.gz"
+
 die() {
     printf '%s\n' "$1" >&2
     exit 1
@@ -88,7 +93,6 @@ create_user_if_not_exists() {
     fi
 }
 
-
 add_user_to_sudo_if_not_already_present() {
     if id -nG "$username" | grep -qw sudo; then
         printf 'user already belongs to sudo\n'
@@ -117,9 +121,49 @@ setup_ssh_if_not_done_previously() {
     fi
 }
 
+download_and_unpack_code_server() {
+    mkdir -p /tmp/code-server
+    cd /tmp/code-server
+    if [ ! -f $code_server_tarball_name ]; then
+        wget https://github.com/coder/code-server/releases/download/v$code_server_version/$code_server_tarball_name
+        printf "code server tarball downloaded\n"
+    fi
+    tar -xzvf $code_server_tarball_name
+    printf "code server tarball unpacked\n"
+}
+
+copy_and_symlink_code_server() {
+    sudo cp -r $code_server_folder_name /usr/lib/code-server
+    sudo ln -sf /usr/lib/code-server/bin/code-server /usr/bin/code-server
+    printf "code server setup finished\n"
+}
+
+create_user_data_dir_for_code_server() {
+    sudo mkdir -p /var/lib/code-server
+}
+
+delete_code_server_installation_files() {
+    rm -rf /tmp/code-server/$code_server_folder_name
+}
+
+setup_systemd_service_for_code_server() {
+    target="${base_dir}/tmp.txt"
+    code_server_service_file="`cat ${base_dir}/code-server.service`"
+
+    printf "$code_server_service_file" "$password" "$username" > $target
+}
+
+
+
 validate_input "$@"
 
 setup_non_root_user
 setup_ssh_if_not_done_previously
+
+download_and_unpack_code_server
+copy_and_symlink_code_server
+create_user_data_dir_for_code_server
+delete_code_server_installation_files
+setup_systemd_service_for_code_server
 
 printf 'success %s %s %s\n' "$username" "$password" "$domain"
