@@ -1,6 +1,14 @@
 # code-server-setup
 Setup script for quickly getting code server up and running on Ubuntu
 
+## Disclaimer
+
+**Warning: Use at Your Own Risk**
+
+The scripts and code provided in this repository are for educational and informational purposes only. They are provided "as is" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability and fitness for a particular purpose. The use of the scripts is at your own risk. The author is not responsible for any damage, data loss, or other issues that may arise from using the scripts.
+
+Please review and understand the code before executing it on your system.
+
 # Assumptions
 1. Scripts are intended for (and tested on) Ubuntu 22.04. Other systems might cause unexpected behavior
 2. Scripts assume a PKI-authentication based SSH session can be established with the server. [How to setup PKI based SSH access](https://snapshooter.com/blog/using-ssh-keys-for-digitalocean)
@@ -13,15 +21,18 @@ Setup script for quickly getting code server up and running on Ubuntu
 
 # How to use
 1. Download scripts to Server.
-1. Ensure prerequisites are installed.
+1. Ensure [prerequisites](#prerequisites) are installed.
 3. Run `./install -u [new-username] -p [access-password] -d [domain]` and follow commands.
-*Each argument is explained below. For further details, check references at the bottom*
+
+*Each [argument](#arguments) is explained below. For further details, check [references](#references) at the bottom*
 
 # Arguments
-1. new-username. It is not recommended to use the root user when accessing server, so the script requires a new username. If the given username does not exist in the system, a new user will be created. Since the newly created user will be given sudo rights, a password should be provided when asked.
-2. access-password. This password will guard your code server access.
-**Note** The `access-password` is different from the user password created when creating the new user.
-3. domain. This is you server domain. This should point to the server where you intend to host Code Server.
+1. `new-username` It is not recommended to use the root user when accessing server, so the script requires a new username. If the given username does not exist in the system, a new user will be created. Since the newly created user will be given sudo rights, a password should be provided when asked.
+2. `access-password` This password will guard your code server access.
+
+**Note**
+The `access-password` is different from the user password created when creating the new user.
+3. `domain` This is you server domain. This should point to the server where you intend to host Code Server.
 
 # References.
 This guide is put together using the following references.
