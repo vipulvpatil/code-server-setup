@@ -180,6 +180,13 @@ start_services() {
     systemctl restart code-server
 }
 
+enable_firewall() {
+  sudo ufw enable
+  sudo ufw allow OpenSSH
+  sudo ufw allow "Nginx HTTPS"
+  sudo ufw reload
+}
+
 validate_input "$@"
 
 setup_non_root_user
@@ -194,5 +201,6 @@ setup_code_server_config_for_nginx
 setup_systemd_service_for_code_server
 setup_ssl
 start_services
+enable_firewall
 
-printf 'success %s %s %s\n' "$username" "$password" "$domain"
+printf 'code server setup completed\n'
