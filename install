@@ -5,9 +5,7 @@ password=
 domain=
 
 base_dir="$( cd "$( dirname "$0" )" && pwd )"
-code_server_version="4.89.1"
-code_server_folder_name="code-server-$code_server_version-linux-amd64"
-code_server_tarball_name="$code_server_folder_name.tar.gz"
+"$base_dir/global"
 
 die() {
     printf '%s\n' "$1" >&2
@@ -146,22 +144,36 @@ delete_code_server_installation_files() {
     rm -rf /tmp/code-server/$code_server_folder_name
 }
 
+download_and_install_nginx() {
+    if sudo dpkg -l | grep -q nginx; then
+      printf "NGINX already installed\n"
+    else
+      sudo apt-get install nginx
+      printf "NGINX installed successfully\n"
+    fi
+}
+
 setup_systemd_service_for_code_server() {
-    target="${base_dir}/tmp.txt"
     code_server_service_file="`cat ${base_dir}/code-server.service`"
-
-    printf "$code_server_service_file" "$password" "$username" > $target
+    printf "$code_server_service_file" "$password" "$username" > $code_server_target_service_file
 }
 
-uninstall_code_server() {
-    # Delete code-server.service
-    sudo systemctl stop code-server
-    rm /usr/bin/code-server
-    rm -rf /usr/lib/code-server
+setup_code_server_config_for_nginx() {
+    nginx_conf_file="`cat ${base_dir}/code-server.conf`"
+    printf "$nginx_conf_file" "$domain" > $nginx_target_conf_file
+    sudo ln -s /etc/nginx/sites-available/code-server.conf /etc/nginx/sites-enabled/code-server.conf
 }
 
-delete_code_server_installer_including_downloaded_tarball() {
-    rm -rf /tmp/code-server/
+setup_ssl() {
+    sudo apt-get install certbot python3-certbot-nginx -y
+    sudo certbot --test-cert --nginx -d "$domain"
+}
+
+start_services() {
+    sudo systemctl start code-server
+    sudo systemctl enable code-server
+    sudo systemctl start nginx
+    sudo systemctl enable nginx
 }
 
 validate_input "$@"
@@ -173,6 +185,10 @@ download_and_unpack_code_server
 copy_and_symlink_code_server
 create_user_data_dir_for_code_server
 delete_code_server_installation_files
+download_and_install_nginx
+setup_code_server_config_for_nginx
 setup_systemd_service_for_code_server
+setup_ssl
+start_services
 
 printf 'success %s %s %s\n' "$username" "$password" "$domain"

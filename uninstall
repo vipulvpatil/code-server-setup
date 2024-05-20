@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+base_dir="$( cd "$( dirname "$0" )" && pwd )"
+"$base_dir/global"
+
+uninstall_code_server() {
+    rm -rf $code_server_target_service_file
+    sudo systemctl stop code-server
+    rm /usr/bin/code-server
+    rm -rf /usr/lib/code-server
+}
+
+delete_code_server_installer_including_downloaded_tarball() {
+    rm -rf /tmp/code-server/
+}
+
+
+delete_nginx() {
+    rm  /etc/nginx/sites-enabled/code-server.conf
+    rm -f /etc/nginx/sites-available/code-server.conf
+    sudo systemctl stop nginx
+    sudo apt-get uninstall certbot
+    sudo apt-get uninstall python3-certbot-nginx
+    sudo apt-get uninstall nginx
+}
+
+uninstall_code_server
+delete_code_server_installer_including_downloaded_tarball
+delete_nginx

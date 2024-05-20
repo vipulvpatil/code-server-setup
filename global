@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+code_server_version="4.89.1"
+code_server_folder_name="code-server-$code_server_version-linux-amd64"
+code_server_tarball_name="$code_server_folder_name.tar.gz"
+
+code_server_target_service_file="/lib/systemd/system/code-server.service"
+nginx_target_conf_file="/etc/nginx/sites-available/code-server.conf"
