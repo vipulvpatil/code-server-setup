@@ -5,7 +5,7 @@ password=
 domain=
 
 base_dir="$( cd "$( dirname "$0" )" && pwd )"
-"$base_dir/global"
+source "$base_dir/global"
 
 die() {
     printf '%s\n' "$1" >&2

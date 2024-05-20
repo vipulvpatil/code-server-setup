@@ -14,3 +14,9 @@ Setup script for quickly getting code server up and running on Ubuntu
 2. Download script
 3. Run `./install -u [new-username] -p [access-password] -d [domain]`
 **Note** The `access-password` is the password for connecting to Code Server. This is different from the user password that is setup during user creation.
+
+# WIP
+git clone repo
+chmod +x ./uninstall
+chmod +x ./install
+chmod +x ./global
