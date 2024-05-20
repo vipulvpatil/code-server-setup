@@ -33,6 +33,7 @@ Please review and understand the code before executing it on your system.
 
 **Note**
 The `access-password` is different from the user password created when creating the new user.
+
 3. `domain` This is you server domain. This should point to the server where you intend to host Code Server.
 
 # References.
