@@ -20,9 +20,10 @@ Please review and understand the code before executing it on your system.
 4. Assumes [systemd](https://ioflood.com/blog/install-systemd-command-linux/)
 
 # How to use
-1. Download scripts to Server.
-1. Ensure [prerequisites](#prerequisites) are installed.
-3. Run `./install -u [new-username] -p [access-password] -d [domain]` and follow commands.
+1. Download [source scripts](https://github.com/vipulvpatil/code-server-setup/releases/latest) and unpack to Server.
+2. Change directory `cd code-server-setup`.
+3. Ensure [prerequisites](#prerequisites) are installed.
+4. Run `./install -u [new-username] -p [access-password] -d [domain]` and follow commands.
 
 *Each [argument](#arguments) is explained below. For further details, check [references](#references) at the bottom*
 
