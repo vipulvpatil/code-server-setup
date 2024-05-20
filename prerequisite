@@ -2,6 +2,5 @@
 
 apt-get update
 apt-get install sudo
-# sudo apt update
 apt-get install wget
 apt-get install rsync
