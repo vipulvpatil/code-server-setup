@@ -138,7 +138,7 @@ copy_and_symlink_code_server() {
 
 create_user_data_dir_for_code_server() {
     sudo mkdir -p /var/lib/code-server
-    sudo chown -R coder /var/lib/code-server
+    sudo chown -R "$username" /var/lib/code-server
 }
 
 delete_code_server_installation_files() {
