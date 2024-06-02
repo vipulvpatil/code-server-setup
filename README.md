@@ -59,6 +59,10 @@ Now if you start a service at 9000, Code Server will auto forward the port to 90
 
 This will make the necessary changes in nginx configuration and also allow you to update your SSL certs using LetsEncrypt.
 
+# Packaging instructions (for development purposes only)
+
+`tar --exclude-vcs --exclude-from=.gitignore -czvf ./build/code-server-setup-1.0.2.tar.gz *`
+
 # References.
 This guide is put together using the following references.
 * https://www.digitalocean.com/community/tutorials/how-to-set-up-the-code-server-cloud-ide-platform-on-ubuntu-22-04
