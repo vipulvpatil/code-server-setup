@@ -23,11 +23,11 @@ Please review and understand the code before executing it on your system.
 1. Download [source scripts](https://github.com/vipulvpatil/code-server-setup/releases/latest) and unpack to Server.
 2. Change directory `cd code-server-setup`.
 3. Ensure [prerequisites](#prerequisites) are installed.
-4. Run `./install -u [new-username] -p [access-password] -d [domain]` and follow commands.
+4. Run `./install -u [new-username] -p [access-password] -d [domain] -e [proxy-pattern]` and follow commands.
 
 *Each [argument](#arguments) is explained below. For further details, check [references](#references) at the bottom*
 
-# Arguments
+## Arguments
 1. `new-username` It is not recommended to use the root user when accessing server, so the script requires a new username. If the given username does not exist in the system, a new user will be created. Since the newly created user will be given sudo rights, a password should be provided when asked.
 2. `access-password` This password will guard your code server access.
 
@@ -35,6 +35,29 @@ Please review and understand the code before executing it on your system.
 The `access-password` is different from the user password created when creating the new user.
 
 3. `domain` This is you server domain. This should point to the server where you intend to host Code Server.
+
+4. `proxy-pattern` *Optional*. This is a pattern like {{port}}.domain.tld for helping with proxying open ports. Read more [here](https://coder.com/docs/code-server/guide#using-a-subdomain)
+
+# Setup forwarded ports in nginx with SSL.
+You can use `./forwarder_setup -d [domain]`
+
+## Arguments
+1. `domain` The domain to add to nginx (and SSL) for forwarding.
+
+## Description
+Code Server allows forwarding of ports for various services. This enables testing of services (escpecially Web frontends) from a local system. Assume you are running code server at `code.vipul.dev`. You could set it up with proxy forwarding as follows.
+
+```
+./install -u vipul -p pass -d code.vipul.dev -e {{port}}.vipul.dev
+```
+
+Now if you start a service at 9000, Code Server will auto forward the port to 9000.vipul.dev. To enable public access, you can run the forwarder setup as follows
+
+```
+./forwarder_setup -d 9000.vipul.dev
+```
+
+This will make the necessary changes in nginx configuration and also allow you to update your SSL certs using LetsEncrypt.
 
 # References.
 This guide is put together using the following references.

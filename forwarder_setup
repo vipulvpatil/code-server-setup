@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+domain=
+all_domains=
+
+base_dir="$( cd "$( dirname "$0" )" && pwd )"
+source "$base_dir/global"
+
+die() {
+    printf '%s\n' "$1" >&2
+    exit 1
+}
+
+show_help() {
+    printf 'Correct Usage: ./forwarder_setup -d [domain]\n'
+    exit 1
+}
+
+validate_input() {
+    while :; do
+        case $1 in
+            -h|--help)
+                show_help
+                exit
+                ;;
+            -d)
+                if [ "$2" ]; then
+                    domain=$2
+                    shift
+                else
+                    die 'ERROR: "-d" requires a non-empty option argument.'
+                fi
+                ;;
+            --)
+                shift
+                break
+                ;;
+            -?*)
+                printf 'WARN: Unknown option: %s\n' "$1" >&2
+                show_help
+                exit
+                ;;
+            *)
+                break
+        esac
+        shift
+    done
+
+    if [[ -z "$domain" ]]; then
+        printf 'ERROR: "-d" is a required argument.\n'
+        show_help
+        exit
+    fi
+}
+
+setup_forwarder_config_for_nginx() {
+    server_name_line=$(grep -m 1 "server_name" "$nginx_target_conf_file")
+    existing_domains=$(echo "$server_name_line" | sed 's/server_name //' | sed 's/;/,/' | tr -s ' ' ',' | sed 's/,$//')
+    # Check if the domain is already in the configuration
+    if echo "$server_name_line" | grep -q "$domain"; then
+        echo "The domain $domain is already in the Nginx configuration."
+        all_domains="$existing_domains"
+    else
+        # Add the domain to the Nginx configuration
+        echo "Adding $domain to the Nginx configuration..."
+        sudo sed -i "0,/server_name/s/;/ $domain;/" "$nginx_target_conf_file"
+        all_domains="$existing_domains,$domain"
+    fi
+}
+
+setup_ssl() {
+    echo "disable firewall to allow for LE certificate expansion"
+    sudo ufw disable
+    sudo certbot --nginx --expand -d "$all_domains"
+    echo "enable firewall again"
+    sudo ufw --force enable
+}
+
+reload_nginx() {
+    sudo systemctl reload nginx
+}
+
+validate_input "$@"
+
+setup_forwarder_config_for_nginx
+setup_ssl
+reload_nginx
+
+printf 'forwarder setup completed\n'
