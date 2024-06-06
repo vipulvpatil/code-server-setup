@@ -6,7 +6,7 @@ After=nginx.service
 Type=simple
 User=%s
 Environment=PASSWORD=%s
-ExecStart=/usr/bin/code-server --bind-addr 127.0.0.1:8080 %s --user-data-dir /var/lib/code-server --auth password
+ExecStart=/usr/bin/code-server --bind-addr 127.0.0.1:8080 --disable-proxy --user-data-dir /var/lib/code-server --auth password
 Restart=always
 
 [Install]

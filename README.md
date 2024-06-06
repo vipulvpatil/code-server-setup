@@ -36,29 +36,6 @@ The `access-password` is different from the user password created when creating 
 
 3. `domain` This is you server domain. This should point to the server where you intend to host Code Server.
 
-4. `proxy-pattern` *Optional*. This is a pattern like {{port}}.domain.tld for helping with proxying open ports. Read more [here](https://coder.com/docs/code-server/guide#using-a-subdomain)
-
-# Setup forwarded ports in nginx with SSL.
-You can use `./forwarder_setup -d [domain]`
-
-## Arguments
-1. `domain` The domain to add to nginx (and SSL) for forwarding.
-
-## Description
-Code Server allows forwarding of ports for various services. This enables testing of services (escpecially Web frontends) from a local system. Assume you are running code server at `code.vipul.dev`. You could set it up with proxy forwarding as follows.
-
-```
-./install -u vipul -p pass -d code.vipul.dev -e {{port}}.vipul.dev
-```
-
-Now if you start a service at 9000, Code Server will auto forward the port to 9000.vipul.dev. To enable public access, you can run the forwarder setup as follows
-
-```
-./forwarder_setup -d 9000.vipul.dev
-```
-
-This will make the necessary changes in nginx configuration and also allow you to update your SSL certs using LetsEncrypt.
-
 # Packaging instructions (for development purposes only)
 
 `tar --exclude-vcs --exclude-from=.gitignore -czvf ./build/code-server-setup-1.0.2.tar.gz *`

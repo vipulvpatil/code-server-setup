@@ -3,7 +3,6 @@
 username=
 password=
 domain=
-proxy_pattern=
 
 base_dir="$( cd "$( dirname "$0" )" && pwd )"
 source "$base_dir/global"
@@ -14,7 +13,7 @@ die() {
 }
 
 show_help() {
-    printf 'Correct Usage: ./install -u [new-username] -p [access-password] -d [domain] -e [proxy pattern] \n'
+    printf 'Correct Usage: ./install -u [new-username] -p [access-password] -d [domain] \n'
     exit 1
 }
 
@@ -47,12 +46,6 @@ validate_input() {
                     shift
                 else
                     die 'ERROR: "-d" requires a non-empty option argument.'
-                fi
-                ;;
-	    -e)
-                if [ "$2" ]; then
-                    proxy_pattern=$2
-                    shift
                 fi
                 ;;
             --)
@@ -163,12 +156,7 @@ download_and_install_nginx() {
 
 setup_systemd_service_for_code_server() {
     code_server_service_file="`cat ${base_dir}/code-server.service`"
-    additional_params=
-    if [[ ! -z "$proxy_pattern" ]]; then
-        additional_params="--proxy-domain $proxy_pattern"
-    fi
-
-    printf "$code_server_service_file" "$username" "$password" "$additional_params" > $code_server_target_service_file
+    printf "$code_server_service_file" "$username" "$password" > $code_server_target_service_file
 }
 
 setup_code_server_config_for_nginx() {
